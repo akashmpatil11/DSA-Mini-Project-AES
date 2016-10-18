@@ -3,13 +3,13 @@
   This program encrypts/decrypts given text file using Advanced Encryption Standard
   (AES) symmectric algorithm.
   
- ### Probelms to be solved
+### Problems to be solved
   <ul>
     <li>Only multiple of 16 bytes(128 bits) of data is encrypted/decrypted.</li>
     <li>Last block which is not of 16 bytes(128 bits) is not encrypted/decrypted
     (Padding has to be done)</li>
    </ul>
- ### Usage
+### Usage
   <ol>
     <li>make</li>
      <li>./try -h(for help)</li>
