@@ -318,7 +318,7 @@ void AntiCipher(char *encry, char *orig, uint8_t *word) {
 int main(int argc, char *argv[]) {
 	uint8_t *word;
 	char *orig, *encry, c; 
-	uint8_t i, x;
+	uint8_t i, x, j, flag = 1, n;
 	FILE *fp1, *fp2;
 
 	if((argc != 4) || (argc == 2 && !strcmp(argv[1], "-h"))) {
@@ -356,26 +356,33 @@ int main(int argc, char *argv[]) {
 	if(!strcmp(argv[1], "-e")) {
 		fp1 = fopen(argv[2], "r");
 		fp2 = fopen(argv[3], "w");
-		while(1) {
+		do {
 			for(i = 0; i < 16; i++) {
 				if((x = fscanf(fp1, "%c", &c) != EOF)) {
 					orig[i] = c;
 				}
 				else {
+					c = (16 - i) + '0';
+					for(j = i; j < 16; j++) {
+						orig[j] = c;
+					}
+					flag = 0;
 					break;
 				}
-			}
-			if(x == 0) {
-				/*padding*/
-				break;
 			}
 			Cipher(orig, encry, word);
 			for(i = 0; i < 16; i++) {
 				fprintf(fp2, "%c", encry[i]);
 			}
+		} while(x);
+		if(flag) {
+			for(i = 0; i < 16; i++)
+				orig[i] = '0';
+			Cipher(orig, encry, word);
+			for(i = 0; i < 16; i++) {
+				fprintf(fp2, "%c", encry[i]);
+			}
 		}
-		fclose(fp1);
-		fclose(fp2);
 	}
 
 	else if(!strcmp(argv[1], "-d")) {
@@ -386,22 +393,27 @@ int main(int argc, char *argv[]) {
 				if((x = fscanf(fp1, "%c", &c) != EOF)) {
 					encry[i] = c;
 				}
-				else {
-					break;
+			}
+			if((x = fscanf(fp1, "%c", &c) == EOF)) {
+				AntiCipher(encry, orig, word);				
+				n = orig[15] - '0';
+				
+				for(i = 0; i < (16 - n); i++) {
+					fprintf(fp2, "%c", orig[i]);
+				}
+				break;
+			}
+			else {
+				fseek(fp1, -1, SEEK_CUR);
+				AntiCipher(encry, orig, word);
+				for(i = 0; i < 16; i++) {
+					fprintf(fp2, "%c", orig[i]);
 				}
 			}
-			if(x == 0)
-				break;
-			AntiCipher(encry, orig, word);
-			for(i = 0; i < 16; i++) {
-				fprintf(fp2, "%c", orig[i]);
-			}
 		}
-		fclose(fp1);
-		fclose(fp2);
-	}	
+	}
 
+	fclose(fp1);
+	fclose(fp2);
 	return 0;
 }
-
-

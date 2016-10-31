@@ -1,4 +1,4 @@
 try: main.c
-	cc main.c -o try
+	cc main.c -o program
 clean:
-	$(RM) try
+	$(RM) program
